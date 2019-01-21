@@ -5,9 +5,9 @@ let { readdir } = require('fs')
 const { stdout, stderr } = process
 readdir = promisify(readdir)
 
-async function listBenchmarks() {
+async function listBenchmarks(filter = '') {
   const benchmarks = await readdir(__dirname)
-  return benchmarks.filter(suite => suite.lastIndexOf('.bench.js') > 0)
+  return benchmarks.filter(suite => suite.lastIndexOf(`${filter}.bench.js`) >= 0)
 }
 
 function runBenchmark(benchmark) {
@@ -30,7 +30,7 @@ function runBenchmark(benchmark) {
 
 (async function () {
   try {
-    const suites = await listBenchmarks()
+    const suites = await listBenchmarks(process.argv[2])
     for (let i = 0, { length } = suites; i < length; i += 1) {
       await runBenchmark(suites[i]) // eslint-disable-line no-await-in-loop
     }
